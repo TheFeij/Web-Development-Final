@@ -49,5 +49,25 @@ create table group_messages (
     group_id bigint references groups(id),
     sender_id bigint references users(id),
     content varchar(300),
-    createdAt date default now()
+    createdAt date default now(),
+    foreign key (group_id, sender_id) references groups(id, people)
+);
+
+create table channels (
+    id bigint primary key,
+    owner_id bigint references users(id),
+    admins bigint[] references users(id),
+    people bigint[] references users(id),
+    createdAt date default now(),
+    constraint people_length check (array_length(people, 1) = 1024),
+    constraint admin_length check (array_length(admins, 1) = 32)
+);
+
+create table channel_messages (
+    id bigint primary key,
+    channel_id bigint references channels(id),
+    sender_id bigint references users(id),
+    content varchar(300),
+    createdAt date default now(),
+    foreign key (channel_id, sender_id) references channels(id, admins)
 );
