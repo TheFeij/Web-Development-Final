@@ -44,36 +44,57 @@ create table chat_messages (
 
 create table groups (
     id bigint primary key,
-    owner_id bigint references users(id),
-    people bigint[] references users(id),
-    createdAt date default now(),
-    constraint people_length check (array_length(people, 1) = 1024)
+    owner_id bigint unique,
+    createdAt date default now()
 );
+
+create table group_participants (
+    group_id bigint references groups(id),
+    user_id bigint references users(id),
+    primary key (group_id, user_id)
+);
+
+-- adding the foreign key that owner of a chat be a participant of that group
+alter table groups
+    add constraint fk_owner foreign key(id, owner_id) references group_participants(group_id, user_id);
 
 create table group_messages (
     id bigint primary key,
-    group_id bigint references groups(id),
-    sender_id bigint references users(id),
+    group_id bigint,
+    sender_id bigint,
     content varchar(300),
     createdAt date default now(),
-    foreign key (group_id, sender_id) references groups(id, people)
+    foreign key (group_id, sender_id) references group_participants(group_id, user_id)
 );
 
 create table channels (
     id bigint primary key,
     owner_id bigint references users(id),
-    admins bigint[] references users(id),
-    people bigint[] references users(id),
-    createdAt date default now(),
-    constraint people_length check (array_length(people, 1) = 1024),
-    constraint admin_length check (array_length(admins, 1) = 32)
+    createdAt date default now()
 );
 
-create table channel_messages (
+create table channel_participants (
+    channel_id bigint references channels(id),
+    user_id bigint references users(id),
+    primary key (channel_id, user_id)
+);
+
+create table channel_admins (
+    channel_id bigint references channels(id),
+    user_id bigint references users(id),
+    primary key (channel_id, user_id),
+    foreign key (channel_id, user_id) references channel_participants(channel_id, user_id)
+);
+
+-- adding the foreign key that owner of a channel be an admin of that channel
+alter table channels
+    add constraint fk_owner foreign key(id, owner_id) references channel_admins(channel_id, user_id);
+
+create table channel_posts (
     id bigint primary key,
     channel_id bigint references channels(id),
     sender_id bigint references users(id),
     content varchar(300),
     createdAt date default now(),
-    foreign key (channel_id, sender_id) references channels(id, admins)
+    foreign key (channel_id, sender_id) references channel_admins(channel_id, user_id)
 );
