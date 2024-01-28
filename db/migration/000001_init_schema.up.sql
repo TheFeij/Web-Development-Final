@@ -25,4 +25,13 @@ create table chats (
     people bigint[] references users(id),
     createdAt date default now(),
     constraint people_length check (array_length(people, 1) = 2)
-)
+);
+
+create table chat_messages (
+    id bigint primary key,
+    chat_id bigint references chats(id),
+    sender_id bigint references users(id),
+    receiver_id bigint references users(id),
+    content varchar(300),
+    createdAt date default now()
+);
