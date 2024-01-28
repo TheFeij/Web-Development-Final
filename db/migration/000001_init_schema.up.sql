@@ -6,7 +6,10 @@ create table users (
     username varchar(128) unique,
     password varchar,
     image varchar unique,
-    bio varchar(100)
+    bio varchar(100),
+    chats bigint[] references chats(id),
+    groups bigint[] references groups(id),
+    channels bigint[] references channels(id)
 );
 
 create table contacts (
