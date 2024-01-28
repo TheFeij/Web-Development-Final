@@ -35,3 +35,11 @@ create table chat_messages (
     content varchar(300),
     createdAt date default now()
 );
+
+create table groups (
+    id bigint primary key,
+    owner_id bigint references users(id),
+    people bigint[] references users(id),
+    createdAt date default now(),
+    constraint people_length check (array_length(people, 1) = 1024)
+);
