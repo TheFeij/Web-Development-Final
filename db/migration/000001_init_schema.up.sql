@@ -19,3 +19,10 @@ create table contacts (
     foreign key (user_id) references users(id),
     foreign key (contact_id) references users(id)
 );
+
+create table chats (
+    id bigint primary key,
+    people bigint[] references users(id),
+    createdAt date default now(),
+    constraint people_length check (array_length(people, 1) = 2)
+)
