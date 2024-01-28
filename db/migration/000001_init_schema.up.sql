@@ -6,10 +6,7 @@ create table users (
     username varchar(128) unique,
     password varchar,
     image varchar unique,
-    bio varchar(100),
-    chats bigint[] references chats(id),
-    groups bigint[] references groups(id),
-    channels bigint[] references channels(id)
+    bio varchar(100)
 );
 
 create table contacts (
@@ -25,18 +22,24 @@ create table contacts (
 
 create table chats (
     id bigint primary key,
-    people bigint[] references users(id),
-    createdAt date default now(),
-    constraint people_length check (array_length(people, 1) = 2)
+    createdAt date default now()
+);
+
+create table chat_participants (
+    chat_id bigint references chats(id),
+    user_id bigint references users(id),
+    primary key (chat_id, user_id)
 );
 
 create table chat_messages (
     id bigint primary key,
     chat_id bigint references chats(id),
-    sender_id bigint references users(id),
-    receiver_id bigint references users(id),
+    sender_id bigint,
+    receiver_id bigint,
     content varchar(300),
-    createdAt date default now()
+    createdAt date default now(),
+    foreign key (chat_id, sender_id) references chat_participants(chat_id, user_id),
+    foreign key (chat_id, receiver_id) references chat_participants(chat_id, user_id)
 );
 
 create table groups (
