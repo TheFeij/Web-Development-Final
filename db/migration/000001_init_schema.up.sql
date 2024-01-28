@@ -43,3 +43,11 @@ create table groups (
     createdAt date default now(),
     constraint people_length check (array_length(people, 1) = 1024)
 );
+
+create table group_messages (
+    id bigint primary key,
+    group_id bigint references groups(id),
+    sender_id bigint references users(id),
+    content varchar(300),
+    createdAt date default now()
+);
