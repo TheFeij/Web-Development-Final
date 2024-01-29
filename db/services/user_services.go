@@ -4,6 +4,7 @@ import (
 	"Messenger/db/models"
 	"Messenger/requests"
 	"Messenger/responses"
+	"Messenger/utils"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -19,11 +20,16 @@ func New(db *gorm.DB) *UserServices {
 }
 
 func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) (responses.RegisterUserResponse, error) {
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return responses.RegisterUserResponse{}, err
+	}
+
 	var newUser models.User
 	newUser = models.User{
 		ID:        uint(uuid.New().ID()),
 		Username:  req.Username,
-		Password:  req.Password,
+		Password:  hashedPassword,
 		Firstname: req.Firstname,
 		Lastname:  req.Lastname,
 		Bio:       req.Bio,
