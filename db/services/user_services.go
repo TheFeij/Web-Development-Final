@@ -3,6 +3,7 @@ package services
 import (
 	"Messenger/db/models"
 	"Messenger/requests"
+	"Messenger/responses"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -17,7 +18,7 @@ func New(db *gorm.DB) *UserServices {
 	}
 }
 
-func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) error {
+func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) (responses.RegisterUserResponse, error) {
 	var newUser models.User
 	newUser = models.User{
 		ID:        uint(uuid.New().ID()),
@@ -31,8 +32,15 @@ func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) err
 	}
 
 	if err := accountServices.DB.Create(&newUser).Error; err != nil {
-		return err
+		return responses.RegisterUserResponse{}, err
 	}
 
-	return nil
+	return responses.RegisterUserResponse{
+		ID:        newUser.ID,
+		Username:  newUser.Username,
+		Firstname: newUser.Firstname,
+		Lastname:  newUser.Lastname,
+		Bio:       newUser.Bio,
+		Phone:     newUser.Phone,
+	}, nil
 }
