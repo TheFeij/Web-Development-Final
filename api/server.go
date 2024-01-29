@@ -1,6 +1,7 @@
 package api
 
 import (
+	"Messenger/api/user"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -22,6 +23,9 @@ func NewServer(db *gorm.DB) *Server {
 			"message": "Welcome to our shop!",
 		})
 	})
+
+	handler := user.NewHandler(server.db)
+	server.router.POST("/api/register", handler.RegisterUser)
 
 	return server
 }
