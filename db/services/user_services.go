@@ -89,3 +89,20 @@ func (accountServices *UserServices) CheckLogin(req requests.LoginRequest) (resp
 		Phone:     user.Phone,
 	}, nil
 }
+
+func (accountServices *UserServices) DeleteUser(userID uint) (responses.UserInformation, error) {
+	var user models.User
+
+	if err := accountServices.DB.Delete(&user, userID).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	return responses.UserInformation{
+		ID:        user.ID,
+		Username:  user.Username,
+		Firstname: user.Firstname,
+		Lastname:  user.Lastname,
+		Bio:       user.Bio,
+		Phone:     user.Phone,
+	}, nil
+}
