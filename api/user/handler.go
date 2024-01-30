@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -91,70 +93,20 @@ func (h Handler) RegisterUser(context *gin.Context) {
 }
 
 func (h Handler) GetUserInformation(context *gin.Context) {
-
-	var req requests.RegisterUser
-	if err := context.ShouldBind(&req); err != nil {
-		context.JSON(http.StatusBadRequest, errResponse(err))
-		return
-	}
-
-	// Handle image upload
-	file, err := context.FormFile("image")
-	if err != nil {
-		context.JSON(http.StatusBadRequest, errResponse(err))
-		return
-	}
-
-	ext := filepath.Ext(file.Filename)
-	if ext != ".jpg" && ext != ".png" {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file extension. Supported formats: jpg, png"})
-		return
-	}
-
-	imagePath := "./data/profile_images/" + req.Username + ext
-	req.Image = imagePath
-
-	//save the user
 	service := services.New(h.db)
-	var res responses.UserInformation
-	res, err = service.RegisterUser(req)
+
+	userID, err := strconv.ParseUint(strings.TrimSpace(context.Param("user_id")), 10, 64)
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, errResponse(err))
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
 
-	if err := context.SaveUploadedFile(file, imagePath); err != nil {
-		context.JSON(http.StatusInternalServerError, errResponse(err))
-		return
-	}
-
-	refreshToken, err := utils.NewToken(utils.UserClaims{
-		ID: res.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-		},
-	})
+	user, err := service.GetUserInfo(uint(userID))
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, errResponse(err))
-		return
+		context.JSON(http.StatusBadRequest, errResponse(err))
 	}
 
-	accessToken, err := utils.NewToken(utils.UserClaims{
-		ID: res.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-		},
-	})
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, errResponse(err))
-		return
-	}
-
-	context.Header("Authorization", accessToken)
-	context.Header("Refresh-Token", refreshToken)
-	context.JSON(http.StatusOK, res)
+	context.JSON(http.StatusOK, user)
 }
 
 func errResponse(err error) gin.H {
