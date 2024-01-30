@@ -5,6 +5,7 @@ import (
 	"Messenger/requests"
 	"Messenger/responses"
 	"Messenger/utils"
+	"errors"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -56,6 +57,27 @@ func (accountServices *UserServices) GetUserInfo(userID uint) (responses.UserInf
 	var user models.User
 	if err := accountServices.DB.First(&user, userID).Error; err != nil {
 		return responses.UserInformation{}, err
+	}
+
+	return responses.UserInformation{
+		ID:        user.ID,
+		Username:  user.Username,
+		Firstname: user.Firstname,
+		Lastname:  user.Lastname,
+		Bio:       user.Bio,
+		Phone:     user.Phone,
+	}, nil
+}
+
+func (accountServices *UserServices) CheckLogin(req requests.LoginRequest) (responses.UserInformation, error) {
+	var user models.User
+
+	if err := accountServices.DB.First(&user, "username = ?", req.Username).Error; err != nil {
+		return responses.UserInformation{}, errors.New("user not found")
+	}
+
+	if err := utils.CheckPasswordHash(req.Password, user.Password); err != nil {
+		return responses.UserInformation{}, errors.New("wrong Password")
 	}
 
 	return responses.UserInformation{
