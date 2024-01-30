@@ -27,6 +27,8 @@ func NewServer(db *gorm.DB) *Server {
 
 	handler := user.NewHandler(server.db)
 	server.router.POST("/api/register", handler.RegisterUser)
+	server.router.GET("/api/refresh-token", handler.GetAccessToken)
+	server.router.POST("/api/login", handler.Login)
 	protectedRoute := server.router.Group("/api/user")
 	protectedRoute.Use(middleware.AuthMiddleware())
 	protectedRoute.GET("/:user_id", handler.GetUserInformation)
