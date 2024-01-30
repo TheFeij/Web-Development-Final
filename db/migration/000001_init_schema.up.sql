@@ -34,6 +34,8 @@ create table chat_participants (
 create table chat_messages (
     id bigint primary key,
     chat_id bigint references chats(id),
+    source_sender_id bigint references users(id),
+    original_message_id bigint,
     sender_id bigint,
     receiver_id bigint,
     content varchar(300),
@@ -61,6 +63,8 @@ alter table groups
 create table group_messages (
     id bigint primary key,
     group_id bigint,
+    source_sender_id bigint references users(id),
+    original_message_id bigint,
     sender_id bigint,
     content varchar(300),
     createdAt date default now(),
@@ -93,6 +97,8 @@ alter table channels
 create table channel_posts (
     id bigint primary key,
     channel_id bigint references channels(id),
+    source_sender_id bigint references users(id),
+    original_message_id bigint,
     sender_id bigint references users(id),
     content varchar(300),
     createdAt date default now(),
