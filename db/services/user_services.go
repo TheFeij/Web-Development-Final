@@ -50,3 +50,20 @@ func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) (re
 		Phone:     newUser.Phone,
 	}, nil
 }
+
+func (accountServices *UserServices) GetUserInfo(userID uint) (responses.UserInformation, error) {
+
+	var user models.User
+	if err := accountServices.DB.First(&user, userID).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	return responses.UserInformation{
+		ID:        user.ID,
+		Username:  user.Username,
+		Firstname: user.Firstname,
+		Lastname:  user.Lastname,
+		Bio:       user.Bio,
+		Phone:     user.Phone,
+	}, nil
+}
