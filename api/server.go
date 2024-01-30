@@ -27,9 +27,9 @@ func NewServer(db *gorm.DB) *Server {
 
 	handler := user.NewHandler(server.db)
 	server.router.POST("/api/register", handler.RegisterUser)
-	protectedGroup := server.router.Group("/api/user")
-	protectedGroup.Use(middleware.AuthMiddleware())
-	server.router.GET("/api/user/:user_id", handler.GetUserInformation)
+	protectedRoute := server.router.Group("/api/user")
+	protectedRoute.Use(middleware.AuthMiddleware())
+	protectedRoute.GET("/:user_id", handler.GetUserInformation)
 
 	return server
 }
