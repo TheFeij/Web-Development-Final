@@ -32,7 +32,7 @@ func NewServer(db *gorm.DB) *Server {
 	protectedRoute := server.router.Group("/api/user")
 	{
 		protectedRoute.Use(middleware.AuthMiddleware())
-		protectedRoute.GET("/", handler.GetUserInformation)
+		protectedRoute.GET("/:user_id", handler.GetUserInformation)
 		protectedRoute.POST("/set_profile_image", handler.SetProfilePicture)
 		protectedRoute.PATCH("/", handler.UpdateUser)
 		protectedRoute.DELETE("/", handler.DeleteUser)
