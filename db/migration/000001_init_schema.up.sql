@@ -22,6 +22,7 @@ create table contacts (
 
 create table chats (
     id bigint primary key,
+    isDead boolean default false,
     createdAt date default now()
 );
 
