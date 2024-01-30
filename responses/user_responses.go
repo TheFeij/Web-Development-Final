@@ -8,3 +8,7 @@ type UserInformation struct {
 	Phone     string `json:"phone"`
 	Bio       string `json:"bio"`
 }
+
+type UsersSearch struct {
+	Usernames []string `json:"usernames"`
+}
