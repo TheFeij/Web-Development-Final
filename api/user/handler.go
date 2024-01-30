@@ -98,21 +98,9 @@ func (h Handler) GetUserInformation(context *gin.Context) {
 func (h Handler) GetAccessToken(context *gin.Context) {
 	refreshToken := context.GetHeader("Refresh-Token")
 
-	if refreshToken == "" {
-		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing refresh token"})
-		return
-	}
-
-	parsedRefreshToken := utils.ParseToken(refreshToken)
-	if parsedRefreshToken == nil || parsedRefreshToken.Valid == false {
-		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token not valid"})
-		return
-	}
-
-	// Attach the user claims to the context for use in the handlers
-	claims, ok := parsedRefreshToken.Claims.(*utils.UserClaims)
-	if !ok {
-		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized - Invalid token claims"})
+	claims, err := utils.ValidateToken(refreshToken)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusUnauthorized, errResponse(err))
 		return
 	}
 
