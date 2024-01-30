@@ -1,6 +1,7 @@
 package api
 
 import (
+	"Messenger/api/middleware"
 	"Messenger/api/user"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -26,6 +27,9 @@ func NewServer(db *gorm.DB) *Server {
 
 	handler := user.NewHandler(server.db)
 	server.router.POST("/api/register", handler.RegisterUser)
+	protectedGroup := server.router.Group("/api/user")
+	protectedGroup.Use(middleware.AuthMiddleware())
+	server.router.GET("/api/user/:user_id", handler.GetUserInformation)
 
 	return server
 }
