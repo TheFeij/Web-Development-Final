@@ -33,19 +33,18 @@ func (h Handler) RegisterUser(context *gin.Context) {
 
 	// Handle image upload
 	file, err := context.FormFile("image")
-	if err != nil {
-		context.JSON(http.StatusBadRequest, errResponse(err))
-		return
-	}
+	hasImage := false
+	if err == nil {
+		hasImage = true
+		ext := filepath.Ext(file.Filename)
+		if ext != ".jpg" && ext != ".png" {
+			context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file extension. Supported formats: jpg, png"})
+			return
+		}
 
-	ext := filepath.Ext(file.Filename)
-	if ext != ".jpg" && ext != ".png" {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file extension. Supported formats: jpg, png"})
-		return
+		imagePath := "./data/profile_images/" + req.Username + ext
+		req.Image = imagePath
 	}
-
-	imagePath := "./data/profile_images/" + req.Username + ext
-	req.Image = imagePath
 
 	//save the user
 	service := services.New(h.db)
@@ -56,9 +55,11 @@ func (h Handler) RegisterUser(context *gin.Context) {
 		return
 	}
 
-	if err := context.SaveUploadedFile(file, imagePath); err != nil {
-		context.JSON(http.StatusInternalServerError, errResponse(err))
-		return
+	if hasImage {
+		if err := context.SaveUploadedFile(file, req.Image); err != nil {
+			context.JSON(http.StatusInternalServerError, errResponse(err))
+			return
+		}
 	}
 
 	refreshToken, err := utils.NewRefreshToken(res.ID)
