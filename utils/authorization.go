@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"time"
@@ -53,4 +54,23 @@ func NewRefreshToken(id uint) (string, error) {
 	}
 
 	return accessToken, nil
+}
+
+func ValidateToken(token string) (*UserClaims, error) {
+	if token == "" {
+		return &UserClaims{}, errors.New("unauthorized - Missing access token")
+	}
+
+	parsedToken := ParseToken(token)
+
+	if parsedToken == nil || !parsedToken.Valid {
+		return &UserClaims{}, errors.New("unauthorized - Invalid access token")
+	}
+
+	claims, ok := parsedToken.Claims.(*UserClaims)
+	if !ok {
+		return &UserClaims{}, errors.New("unauthorized - Invalid token claims")
+	}
+
+	return claims, nil
 }
