@@ -1,6 +1,6 @@
 package responses
 
-type RegisterUserResponse struct {
+type UserInformation struct {
 	ID        uint   `json:"id"`
 	Username  string `json:"username"`
 	Firstname string `json:"firstname"`

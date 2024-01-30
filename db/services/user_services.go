@@ -19,10 +19,10 @@ func New(db *gorm.DB) *UserServices {
 	}
 }
 
-func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) (responses.RegisterUserResponse, error) {
+func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) (responses.UserInformation, error) {
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
-		return responses.RegisterUserResponse{}, err
+		return responses.UserInformation{}, err
 	}
 
 	var newUser models.User
@@ -38,10 +38,10 @@ func (accountServices *UserServices) RegisterUser(req requests.RegisterUser) (re
 	}
 
 	if err := accountServices.DB.Create(&newUser).Error; err != nil {
-		return responses.RegisterUserResponse{}, err
+		return responses.UserInformation{}, err
 	}
 
-	return responses.RegisterUserResponse{
+	return responses.UserInformation{
 		ID:        newUser.ID,
 		Username:  newUser.Username,
 		Firstname: newUser.Firstname,
