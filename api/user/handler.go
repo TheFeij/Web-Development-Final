@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type Handler struct {
@@ -87,6 +88,11 @@ func (h Handler) SetProfilePicture(context *gin.Context) {
 }
 
 func (h Handler) GetUserInformation(context *gin.Context) {
+	userID, err := strconv.ParseUint(strings.TrimSpace(context.Param("user_id")), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
 
 	claims, err := getClaims(context)
 	if err != nil {
@@ -99,6 +105,11 @@ func (h Handler) GetUserInformation(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, errResponse(err))
 	}
 
+	if uint64(claims.ID) != userID {
+		if !user.DisplayPhone {
+			user.Phone = ""
+		}
+	}
 	context.JSON(http.StatusOK, user)
 }
 
