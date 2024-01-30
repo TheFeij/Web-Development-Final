@@ -9,3 +9,8 @@ type RegisterUser struct {
 	Bio       string `form:"bio" validate:"max=100"`
 	Image     string
 }
+
+type LoginRequest struct {
+	Username string `json:"username" validate:"required;min=4;max=128"`
+	Password string `json:"password" validate:"required;min=8;max=64"`
+}
