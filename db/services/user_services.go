@@ -118,6 +118,8 @@ func (userServices *UserServices) DeleteUser(userID uint) (responses.UserInforma
 		Bio:       user.Bio,
 		Phone:     user.Phone,
 	}, nil
+
+	//TODO : we have to also perform deletions in other tables and delete the user
 }
 
 func (userServices *UserServices) UpdateUser(req requests.RegisterUser, userID uint) (responses.UserInformation, error) {
