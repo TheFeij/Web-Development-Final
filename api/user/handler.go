@@ -88,10 +88,9 @@ func (h Handler) SetProfilePicture(context *gin.Context) {
 }
 
 func (h Handler) GetUserInformation(context *gin.Context) {
-	userID, err := strconv.ParseUint(strings.TrimSpace(context.Param("user_id")), 10, 64)
+	userID, err := getUserIDParam(context)
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
+		context.JSON(http.StatusBadRequest, errResponse(err))
 	}
 
 	claims, err := getClaims(context)
@@ -217,4 +216,12 @@ func getClaims(context *gin.Context) (utils.UserClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func getUserIDParam(context *gin.Context) (uint64, error) {
+	userID, err := strconv.ParseUint(strings.TrimSpace(context.Param("user_id")), 10, 64)
+	if err != nil {
+		return 0, errors.New("invalid user ID")
+	}
+	return userID, nil
 }
