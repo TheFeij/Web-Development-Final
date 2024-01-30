@@ -31,7 +31,11 @@ func NewServer(db *gorm.DB) *Server {
 	server.router.POST("/api/login", handler.Login)
 	protectedRoute := server.router.Group("/api/user")
 	protectedRoute.Use(middleware.AuthMiddleware())
-	protectedRoute.GET("/:user_id", handler.GetUserInformation)
+	protectedRoute.GET("/", handler.GetUserInformation)
+	protectedRoute.POST("/set_profile_image", handler.SetProfilePicture)
+	protectedRoute.POST("/set_profile_image", handler.SetProfilePicture)
+	protectedRoute.PATCH("/", handler.UpdateUser)
+	protectedRoute.DELETE("/", handler.DeleteUser)
 
 	return server
 }
