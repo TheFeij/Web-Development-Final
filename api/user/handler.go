@@ -6,13 +6,11 @@ import (
 	"Messenger/responses"
 	"Messenger/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 	"net/http"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Handler struct {
@@ -63,25 +61,13 @@ func (h Handler) RegisterUser(context *gin.Context) {
 		return
 	}
 
-	refreshToken, err := utils.NewToken(utils.UserClaims{
-		ID: res.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-		},
-	})
+	refreshToken, err := utils.NewRefreshToken(res.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
 
-	accessToken, err := utils.NewToken(utils.UserClaims{
-		ID: res.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-		},
-	})
+	accessToken, err := utils.NewAccessToken(res.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
@@ -130,13 +116,7 @@ func (h Handler) GetAccessToken(context *gin.Context) {
 		return
 	}
 
-	accessToken, err := utils.NewToken(utils.UserClaims{
-		ID: claims.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-		},
-	})
+	accessToken, err := utils.NewAccessToken(claims.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
@@ -161,25 +141,13 @@ func (h Handler) Login(context *gin.Context) {
 		return
 	}
 
-	refreshToken, err := utils.NewToken(utils.UserClaims{
-		ID: res.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-		},
-	})
+	refreshToken, err := utils.NewRefreshToken(res.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
 
-	accessToken, err := utils.NewToken(utils.UserClaims{
-		ID: res.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
-		},
-	})
+	accessToken, err := utils.NewAccessToken(res.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
