@@ -153,3 +153,16 @@ func (userServices *UserServices) UpdateUser(req requests.RegisterUser, userID u
 		DisplayProfilePicture: user.DisplayImage,
 	}, nil
 }
+
+func (userServices *UserServices) SearchUsers(keyword string) (responses.UsersSearch, error) {
+	var results responses.UsersSearch
+
+	if err := userServices.DB.Model(&models.User{}).
+		Where("username LIKE ?", "%"+keyword+"%").
+		Pluck("username", &results.Usernames).
+		Error; err != nil {
+		return responses.UsersSearch{}, err
+	}
+
+	return results, nil
+}
