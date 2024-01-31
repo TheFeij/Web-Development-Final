@@ -1,6 +1,6 @@
 package responses
 
-type ContactsList struct {
+type AddContact struct {
 	ContactID   uint
 	ContactName string
 }
