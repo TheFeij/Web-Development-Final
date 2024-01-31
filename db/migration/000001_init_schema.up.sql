@@ -47,6 +47,7 @@ create table chat_messages (
 
 create table groups (
     id bigint primary key,
+    name varchar(64) not null,
     owner_id bigint unique,
     createdAt date default now()
 );
@@ -74,6 +75,7 @@ create table group_messages (
 
 create table channels (
     id bigint primary key,
+    name varchar(64) not null,
     owner_id bigint references users(id),
     createdAt date default now()
 );
