@@ -1,10 +1,9 @@
 package responses
 
-type Contact struct {
-	ContactID   uint   `json:"contact_id"`
-	ContactName string `json:"contact_name"`
-}
+import "time"
 
-type ContactsList struct {
-	Contacts []Contact `json:"contacts"`
+type Chat struct {
+	ID        uint      `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	IsDead    bool      `json:"is_dead"`
 }
