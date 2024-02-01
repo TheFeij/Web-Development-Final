@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -83,6 +84,31 @@ func (h UserHandler) SetProfilePicture(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
+}
+
+func (h UserHandler) GetProfilePic(context *gin.Context) {
+	claims, err := GetClaims(context)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+
+	imagePath, err := h.services.GetProfileImagePath(claims.ID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+
+	fileContent, err := ioutil.ReadFile(imagePath)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+
+	context.Header("Content-Type", http.DetectContentType(fileContent))
+	context.Header("Content-Length", strconv.Itoa(len(fileContent)))
+
+	context.Data(http.StatusOK, http.DetectContentType(fileContent), fileContent)
 }
 
 func (h UserHandler) GetUserInformation(context *gin.Context) {
