@@ -69,3 +69,33 @@ func (groupServices *GroupServices) AddMember(req requests.AddMember, userID uin
 		UserID: groupParticipant.UserID,
 	}, nil
 }
+
+func (groupServices *GroupServices) DeleteMember(memberID, userID, groupID uint) (responses.Member, error) {
+	ownerCheck := models.Groups{}
+	if err := groupServices.DB.
+		Where("id = ? AND owner_id = ?", groupID, userID).
+		First(&ownerCheck).
+		Error; err != nil {
+		return responses.Member{}, errors.New("user is not the owner of the group")
+	}
+
+	var memberCheck models.GroupParticipant
+	if err := groupServices.DB.
+		Where("group_id = ? AND user_id = ?", groupID, memberID).
+		First(&memberCheck).
+		Error; err != nil {
+		return responses.Member{}, errors.New("user is not a member of the group")
+	}
+
+	var deletedMember models.GroupParticipant
+
+	if err := groupServices.DB.Where("group_id = ? AND user_id = ?", groupID, memberID).
+		Delete(&deletedMember).
+		Error; err != nil {
+		return responses.Member{}, err
+	}
+
+	return responses.Member{
+		UserID: deletedMember.UserID,
+	}, nil
+}
