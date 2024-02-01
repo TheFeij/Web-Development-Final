@@ -58,7 +58,7 @@ func (h UserHandler) RegisterUser(context *gin.Context) {
 
 func (h UserHandler) SetProfilePicture(context *gin.Context) {
 
-	claims, err := getClaims(context)
+	claims, err := GetClaims(context)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 	}
@@ -87,12 +87,12 @@ func (h UserHandler) SetProfilePicture(context *gin.Context) {
 }
 
 func (h UserHandler) GetUserInformation(context *gin.Context) {
-	userID, err := getUserIDParam(context)
+	userID, err := GetUserIDParam(context)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, errResponse(err))
 	}
 
-	claims, err := getClaims(context)
+	claims, err := GetClaims(context)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 	}
@@ -161,7 +161,7 @@ func (h UserHandler) Login(context *gin.Context) {
 }
 
 func (h UserHandler) DeleteUser(context *gin.Context) {
-	claims, err := getClaims(context)
+	claims, err := GetClaims(context)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 	}
@@ -182,7 +182,7 @@ func (h UserHandler) UpdateUser(context *gin.Context) {
 		return
 	}
 
-	claims, err := getClaims(context)
+	claims, err := GetClaims(context)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 	}
@@ -200,7 +200,7 @@ func errResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
 }
 
-func getClaims(context *gin.Context) (utils.UserClaims, error) {
+func GetClaims(context *gin.Context) (utils.UserClaims, error) {
 	var claims utils.UserClaims
 	value, _ := context.Get("userClaims")
 	if userClaims, ok := value.(utils.UserClaims); ok {
@@ -213,7 +213,7 @@ func getClaims(context *gin.Context) (utils.UserClaims, error) {
 	return claims, nil
 }
 
-func getUserIDParam(context *gin.Context) (uint64, error) {
+func GetUserIDParam(context *gin.Context) (uint64, error) {
 	userID, err := strconv.ParseUint(strings.TrimSpace(context.Param("user_id")), 10, 64)
 	if err != nil {
 		return 0, errors.New("invalid handlers ID")
