@@ -66,13 +66,8 @@ func (chatServices *ChatServices) CreateChat(req requests.CreatChat, userID uint
 func (chatServices *ChatServices) DeleteChat(chatID, userID uint) (responses.Chat, error) {
 	var deletedChat models.Chat
 
-	// Check if the user is a participant of the chat
-	participant := models.ChatParticipant{}
-	if err := chatServices.DB.
-		Where("chat_id = ? AND user_id = ?", chatID, userID).
-		First(&participant).
-		Error; err != nil {
-		return responses.Chat{}, errors.New("user is not a participant of the chat")
+	if err := chatServices.isUserInChat(userID, chatID); err != nil {
+		return responses.Chat{}, err
 	}
 
 	// If the user is a participant, delete the chat and associated participants
@@ -114,13 +109,8 @@ func (chatServices *ChatServices) GetChatsList(userID uint) (responses.ChatsList
 func (chatServices *ChatServices) GetChatContent(userID uint, chatID uint) (responses.ChatContent, error) {
 	var chatContent responses.ChatContent
 
-	// Check if the user is a participant of the chat
-	participant := models.ChatParticipant{}
-	if err := chatServices.DB.
-		Where("chat_id = ? AND user_id = ?", chatID, userID).
-		First(&participant).
-		Error; err != nil {
-		return responses.ChatContent{}, errors.New("user is not a participant of the chat")
+	if err := chatServices.isUserInChat(userID, chatID); err != nil {
+		return responses.ChatContent{}, err
 	}
 
 	// If the user is a participant, retrieve the chat and its messages
@@ -146,13 +136,8 @@ func (chatServices *ChatServices) GetChatContent(userID uint, chatID uint) (resp
 func (chatServices *ChatServices) DeleteChatMessage(userID uint, chatID uint, messageID uint) (responses.ChatMessage, error) {
 	var deletedMessage models.ChatMessage
 
-	// Check if the user is a participant of the chat
-	participant := models.ChatParticipant{}
-	if err := chatServices.DB.
-		Where("chat_id = ? AND user_id = ?", chatID, userID).
-		First(&participant).
-		Error; err != nil {
-		return responses.ChatMessage{}, errors.New("user is not a participant of the chat")
+	if err := chatServices.isUserInChat(userID, chatID); err != nil {
+		return responses.ChatMessage{}, err
 	}
 
 	if err := chatServices.DB.Where("id = ? AND chat_id = ?", messageID, chatID).
@@ -171,4 +156,17 @@ func (chatServices *ChatServices) DeleteChatMessage(userID uint, chatID uint, me
 		Content:           deletedMessage.Content,
 		CreatedAt:         deletedMessage.CreatedAt,
 	}, nil
+}
+
+func (chatServices *ChatServices) isUserInChat(userID uint, chatID uint) error {
+	// Check if the user is a participant of the chat
+	participant := models.ChatParticipant{}
+	if err := chatServices.DB.
+		Where("chat_id = ? AND user_id = ?", chatID, userID).
+		First(&participant).
+		Error; err != nil {
+		return errors.New("user is not a participant of the chat")
+	}
+
+	return nil
 }
