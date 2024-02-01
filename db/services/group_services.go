@@ -48,12 +48,12 @@ func (groupServices *GroupServices) CreateGroup(req requests.CreatGroup, userID 
 }
 
 func (groupServices *GroupServices) AddMember(req requests.AddMember, userID uint, groupID uint) (responses.Member, error) {
-	ownerCheck := models.Groups{}
-	if err := groupServices.DB.
-		Where("id = ? AND owner = ?", groupID, userID).
-		First(&ownerCheck).
-		Error; err != nil {
-		return responses.Member{}, errors.New("user is not the owner of the group")
+	if err := groupServices.isOwner(userID, groupID); err != nil {
+		return responses.Member{}, err
+	}
+
+	if err := groupServices.isMember(req.UserID, groupID); err == nil {
+		return responses.Member{}, errors.New("user is already a member of the group")
 	}
 
 	groupParticipant := models.GroupParticipant{
@@ -71,24 +71,15 @@ func (groupServices *GroupServices) AddMember(req requests.AddMember, userID uin
 }
 
 func (groupServices *GroupServices) DeleteMember(memberID, userID, groupID uint) (responses.Member, error) {
-	ownerCheck := models.Groups{}
-	if err := groupServices.DB.
-		Where("id = ? AND owner_id = ?", groupID, userID).
-		First(&ownerCheck).
-		Error; err != nil {
-		return responses.Member{}, errors.New("user is not the owner of the group")
+	if err := groupServices.isOwner(userID, groupID); err != nil {
+		return responses.Member{}, err
 	}
 
-	var memberCheck models.GroupParticipant
-	if err := groupServices.DB.
-		Where("group_id = ? AND user_id = ?", groupID, memberID).
-		First(&memberCheck).
-		Error; err != nil {
-		return responses.Member{}, errors.New("user is not a member of the group")
+	if err := groupServices.isMember(memberID, groupID); err != nil {
+		return responses.Member{}, err
 	}
 
 	var deletedMember models.GroupParticipant
-
 	if err := groupServices.DB.Where("group_id = ? AND user_id = ?", groupID, memberID).
 		Delete(&deletedMember).
 		Error; err != nil {
@@ -101,12 +92,8 @@ func (groupServices *GroupServices) DeleteMember(memberID, userID, groupID uint)
 }
 
 func (groupServices *GroupServices) DeleteGroup(userID, groupID uint) (responses.Group, error) {
-	var ownerCheck models.Groups
-	if err := groupServices.DB.
-		Where("id = ? AND owner = ?", groupID, userID).
-		First(&ownerCheck).
-		Error; err != nil {
-		return responses.Group{}, errors.New("user is not the owner of the group")
+	if err := groupServices.isOwner(userID, groupID); err != nil {
+		return responses.Group{}, err
 	}
 
 	var deletedGroup models.Groups
@@ -137,4 +124,26 @@ func (groupServices *GroupServices) DeleteGroup(userID, groupID uint) (responses
 		CreatedAt: deletedGroup.CreatedAt,
 		Owner:     deletedGroup.Owner,
 	}, nil
+}
+
+func (groupServices *GroupServices) isOwner(userID, groupID uint) error {
+	var ownerCheck models.Groups
+	if err := groupServices.DB.
+		Where("id = ? AND owner = ?", groupID, userID).
+		First(&ownerCheck).
+		Error; err != nil {
+		return errors.New("user is not the owner of the group")
+	}
+
+	return nil
+}
+
+func (groupServices *GroupServices) isMember(memberID, groupID uint) error {
+	var memberCheck models.GroupParticipant
+	if err := groupServices.DB.
+		Where("group_id = ? AND user_id = ?", groupID, memberID).
+		First(&memberCheck).
+		Error; err != nil {
+		return errors.New("user is not a member of the group")
+	}
 }
