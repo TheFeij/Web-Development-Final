@@ -96,3 +96,17 @@ func (chatServices *ChatServices) DeleteChat(chatID, userID uint) (responses.Cha
 		CreatedAt: deletedChat.CreatedAt,
 	}, nil
 }
+
+func (chatServices *ChatServices) GetChatsList(userID uint) (responses.ChatsList, error) {
+	var chatsList responses.ChatsList
+
+	if err := chatServices.DB.Model(&models.ChatParticipant{}).
+		Joins("JOIN chats ON chat_participants.chat_id = chats.id").
+		Where("chat_participants.user_id = ?", userID).
+		Select("chats.id, chats.created_at, chats.is_dead").
+		Find(&chatsList.Chats).Error; err != nil {
+		return chatsList, err
+	}
+
+	return chatsList, nil
+}
