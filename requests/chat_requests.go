@@ -1,5 +1,5 @@
 package requests
 
-type CreatChat struct {
+type CreateChat struct {
 	ParticipantID uint `json:"participant_id" validate:"required"`
 }

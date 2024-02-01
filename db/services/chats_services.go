@@ -13,7 +13,7 @@ type ChatServices struct {
 	DB *gorm.DB
 }
 
-func (chatServices *ChatServices) CreateChat(req requests.CreatChat, userID uint) (responses.Chat, error) {
+func (chatServices *ChatServices) CreateChat(req requests.CreateChat, userID uint) (responses.Chat, error) {
 	var newChat models.Chat
 
 	// Check if a chat already exists between the two users
