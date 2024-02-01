@@ -15,7 +15,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		context.Set("userClaims", claims)
+		context.Set("userClaims", *claims)
 		context.Next()
 	}
 }
