@@ -62,3 +62,37 @@ func (chatServices *ChatServices) CreateChat(req requests.CreatChat, userID uint
 		CreatedAt: newChat.CreatedAt,
 	}, nil
 }
+
+func (chatServices *ChatServices) DeleteChat(chatID, userID uint) (responses.Chat, error) {
+	var deletedChat models.Chat
+
+	// Check if the user is a participant of the chat
+	participant := models.ChatParticipant{}
+	if err := chatServices.DB.
+		Where("chat_id = ? AND user_id = ?", chatID, userID).
+		First(&participant).
+		Error; err != nil {
+		return responses.Chat{}, errors.New("user is not a participant of the chat")
+	}
+
+	// If the user is a participant, delete the chat and associated participants
+	if err := chatServices.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("chat_id = ?", chatID).Delete(models.ChatParticipant{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("id = ?", chatID).Delete(&deletedChat).Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return responses.Chat{}, err
+	}
+
+	return responses.Chat{
+		ID:        deletedChat.ID,
+		IsDead:    deletedChat.IsDead,
+		CreatedAt: deletedChat.CreatedAt,
+	}, nil
+}
