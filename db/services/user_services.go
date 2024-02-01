@@ -60,6 +60,19 @@ func (userServices *UserServices) SetProfileImage(userID uint, imagePath string)
 	return nil
 }
 
+func (userServices *UserServices) GetProfileImagePath(userID uint) (string, error) {
+	var user models.User
+
+	if err := userServices.DB.Model(&models.User{}).
+		Where("id = ?", userID).
+		First(&user).
+		Error; err != nil {
+		return "", err
+	}
+
+	return user.Image, nil
+}
+
 func (userServices *UserServices) GetUserInfo(userID uint) (responses.UserInformation, error) {
 
 	var user models.User
