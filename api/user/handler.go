@@ -14,12 +14,14 @@ import (
 )
 
 type Handler struct {
-	db *gorm.DB
+	db       *gorm.DB
+	services *services.UserServices
 }
 
-func NewHandler(db *gorm.DB) *Handler {
+func NewHandler(db *gorm.DB, services *services.UserServices) *Handler {
 	return &Handler{
-		db: db,
+		db:       db,
+		services: services,
 	}
 }
 
@@ -31,9 +33,7 @@ func (h Handler) RegisterUser(context *gin.Context) {
 		return
 	}
 
-	//save the user
-	service := services.New(h.db)
-	res, err := service.RegisterUser(req)
+	res, err := h.services.RegisterUser(req)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
@@ -75,8 +75,7 @@ func (h Handler) SetProfilePicture(context *gin.Context) {
 
 	imagePath := "./data/profile_images/" + strconv.FormatUint(uint64(claims.ID), 10) + ext
 
-	service := services.New(h.db)
-	if err := service.SetProfileImage(claims.ID, imagePath); err != nil {
+	if err := h.services.SetProfileImage(claims.ID, imagePath); err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
 	}
@@ -98,8 +97,7 @@ func (h Handler) GetUserInformation(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 	}
 
-	service := services.New(h.db)
-	user, err := service.GetUserInfo(claims.ID)
+	user, err := h.services.GetUserInfo(claims.ID)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, errResponse(err))
 	}
@@ -139,8 +137,7 @@ func (h Handler) Login(context *gin.Context) {
 		return
 	}
 
-	service := services.New(h.db)
-	res, err := service.CheckLogin(req)
+	res, err := h.services.CheckLogin(req)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, errResponse(err))
 		return
@@ -169,8 +166,7 @@ func (h Handler) DeleteUser(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 	}
 
-	service := services.New(h.db)
-	res, err := service.DeleteUser(claims.ID)
+	res, err := h.services.DeleteUser(claims.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
@@ -191,8 +187,7 @@ func (h Handler) UpdateUser(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 	}
 
-	service := services.New(h.db)
-	res, err := service.UpdateUser(req, claims.ID)
+	res, err := h.services.UpdateUser(req, claims.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
