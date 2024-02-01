@@ -47,3 +47,22 @@ func (contactsServices *ContactsServices) AddContacts(req requests.AddContact, u
 		ContactName: newContact.ContactName,
 	}, nil
 }
+
+func (contactsServices *ContactsServices) DeleteContacts(contactID uint, userID uint) (responses.Contact, error) {
+	var contact models.Contact
+
+	if err := contactsServices.DB.
+		Where("user_id = ? and contact_id = ?", userID, contactID).
+		First(&contact).Error; err != nil {
+		return responses.Contact{}, err
+	}
+
+	if err := contactsServices.DB.Delete(&contact).Error; err != nil {
+		return responses.Contact{}, err
+	}
+
+	return responses.Contact{
+		ContactID:   contact.ContactID,
+		ContactName: contact.ContactName,
+	}, nil
+}
