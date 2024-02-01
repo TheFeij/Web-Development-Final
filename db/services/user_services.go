@@ -94,7 +94,7 @@ func (userServices *UserServices) CheckLogin(req requests.LoginRequest) (respons
 	var user models.User
 
 	if err := userServices.DB.First(&user, "username = ?", req.Username).Error; err != nil {
-		return responses.UserInformation{}, errors.New("handlers not found")
+		return responses.UserInformation{}, errors.New("user not found")
 	}
 
 	if err := utils.CheckPasswordHash(req.Password, user.Password); err != nil {
