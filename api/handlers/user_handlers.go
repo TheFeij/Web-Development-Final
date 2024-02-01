@@ -86,7 +86,7 @@ func (h UserHandler) SetProfilePicture(context *gin.Context) {
 	}
 }
 
-func (h UserHandler) GetProfilePic(context *gin.Context) {
+func (h UserHandler) GetProfilePicture(context *gin.Context) {
 	claims, err := GetClaims(context)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
