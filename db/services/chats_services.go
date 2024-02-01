@@ -110,3 +110,35 @@ func (chatServices *ChatServices) GetChatsList(userID uint) (responses.ChatsList
 
 	return chatsList, nil
 }
+
+func (chatServices *ChatServices) GetChatContent(userID uint, chatID uint) (responses.ChatContent, error) {
+	var chatContent responses.ChatContent
+
+	// Check if the user is a participant of the chat
+	participant := models.ChatParticipant{}
+	if err := chatServices.DB.
+		Where("chat_id = ? AND user_id = ?", chatID, userID).
+		First(&participant).
+		Error; err != nil {
+		return responses.ChatContent{}, errors.New("user is not a participant of the chat")
+	}
+
+	// If the user is a participant, retrieve the chat and its messages
+	if err := chatServices.DB.Model(&models.Chat{}).
+		Where("id = ?", chatID).
+		First(&chatContent.Chat).
+		Error; err != nil {
+		return responses.ChatContent{}, err
+	}
+
+	// Retrieve messages for the chat
+	if err := chatServices.DB.Model(&models.ChatMessage{}).
+		Where("chat_id = ?", chatID).
+		Order("created_at").
+		Find(&chatContent.Messages).
+		Error; err != nil {
+		return responses.ChatContent{}, err
+	}
+
+	return chatContent, nil
+}
