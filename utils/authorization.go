@@ -58,13 +58,13 @@ func NewRefreshToken(id uint) (string, error) {
 
 func ValidateToken(token string) (*UserClaims, error) {
 	if token == "" {
-		return &UserClaims{}, errors.New("unauthorized - Missing access token")
+		return &UserClaims{}, errors.New("unauthorized - Missing token")
 	}
 
 	parsedToken := ParseToken(token)
 
 	if parsedToken == nil || !parsedToken.Valid {
-		return &UserClaims{}, errors.New("unauthorized - Invalid access token")
+		return &UserClaims{}, errors.New("unauthorized - Invalid token")
 	}
 
 	claims, ok := parsedToken.Claims.(*UserClaims)
