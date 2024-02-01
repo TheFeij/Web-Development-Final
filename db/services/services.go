@@ -6,6 +6,8 @@ type Services struct {
 	ChatServices     *ChatServices
 	ContactsServices *ContactsServices
 	UserServices     *UserServices
+	GroupServices    *GroupServices
+	ChannelServices  *ChannelServices
 }
 
 func New(db *gorm.DB) *Services {
@@ -17,6 +19,12 @@ func New(db *gorm.DB) *Services {
 			DB: db,
 		},
 		UserServices: &UserServices{
+			DB: db,
+		},
+		GroupServices: &GroupServices{
+			DB: db,
+		},
+		ChannelServices: &ChannelServices{
 			DB: db,
 		},
 	}
