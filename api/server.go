@@ -38,6 +38,7 @@ func NewServer(db *gorm.DB) *Server {
 		usersRouter.GET("/profile_image", handler.UserHandler.GetProfilePicture)
 		usersRouter.PATCH("/", handler.UserHandler.UpdateUser)
 		usersRouter.DELETE("/", handler.UserHandler.DeleteUser)
+		usersRouter.GET("/", handler.UserHandler.SearchUsers)
 
 		usersRouter.GET("/contacts", handler.ContactHandler.GetContacts)
 		usersRouter.POST("/contacts", handler.ContactHandler.AddContact)
