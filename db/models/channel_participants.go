@@ -1,6 +1,6 @@
 package models
 
 type ChannelParticipant struct {
-	ChatID uint
-	UserID uint
+	ChannelID uint
+	UserID    uint
 }
