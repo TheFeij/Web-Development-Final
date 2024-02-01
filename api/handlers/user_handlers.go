@@ -13,19 +13,19 @@ import (
 	"strings"
 )
 
-type Handler struct {
+type UserHandler struct {
 	db       *gorm.DB
 	services *services.UserServices
 }
 
-func NewHandler(db *gorm.DB, services *services.UserServices) *Handler {
-	return &Handler{
+func NewHandler(db *gorm.DB, services *services.UserServices) *UserHandler {
+	return &UserHandler{
 		db:       db,
 		services: services,
 	}
 }
 
-func (h Handler) RegisterUser(context *gin.Context) {
+func (h UserHandler) RegisterUser(context *gin.Context) {
 
 	var req requests.RegisterUser
 	if err := context.ShouldBind(&req); err != nil {
@@ -56,7 +56,7 @@ func (h Handler) RegisterUser(context *gin.Context) {
 	context.JSON(http.StatusOK, res)
 }
 
-func (h Handler) SetProfilePicture(context *gin.Context) {
+func (h UserHandler) SetProfilePicture(context *gin.Context) {
 
 	claims, err := getClaims(context)
 	if err != nil {
@@ -86,7 +86,7 @@ func (h Handler) SetProfilePicture(context *gin.Context) {
 	}
 }
 
-func (h Handler) GetUserInformation(context *gin.Context) {
+func (h UserHandler) GetUserInformation(context *gin.Context) {
 	userID, err := getUserIDParam(context)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, errResponse(err))
@@ -110,7 +110,7 @@ func (h Handler) GetUserInformation(context *gin.Context) {
 	context.JSON(http.StatusOK, user)
 }
 
-func (h Handler) GetAccessToken(context *gin.Context) {
+func (h UserHandler) GetAccessToken(context *gin.Context) {
 	refreshToken := context.GetHeader("Refresh-Token")
 
 	claims, err := utils.ValidateToken(refreshToken)
@@ -130,7 +130,7 @@ func (h Handler) GetAccessToken(context *gin.Context) {
 	context.Status(http.StatusOK)
 }
 
-func (h Handler) Login(context *gin.Context) {
+func (h UserHandler) Login(context *gin.Context) {
 	var req requests.LoginRequest
 	if err := context.ShouldBindJSON(&req); err != nil {
 		context.JSON(http.StatusBadRequest, errResponse(err))
@@ -160,7 +160,7 @@ func (h Handler) Login(context *gin.Context) {
 	context.JSON(http.StatusOK, res)
 }
 
-func (h Handler) DeleteUser(context *gin.Context) {
+func (h UserHandler) DeleteUser(context *gin.Context) {
 	claims, err := getClaims(context)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
@@ -175,7 +175,7 @@ func (h Handler) DeleteUser(context *gin.Context) {
 	context.JSON(http.StatusOK, res)
 }
 
-func (h Handler) UpdateUser(context *gin.Context) {
+func (h UserHandler) UpdateUser(context *gin.Context) {
 	var req requests.RegisterUser
 	if err := context.ShouldBind(&req); err != nil {
 		context.JSON(http.StatusBadRequest, errResponse(err))
