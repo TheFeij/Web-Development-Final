@@ -50,6 +50,22 @@ func (h UserHandler) RegisterUser(context *gin.Context) {
 	context.JSON(http.StatusOK, res)
 }
 
+func (h UserHandler) SearchUsers(context *gin.Context) {
+	keyword := context.Query("keyword")
+	if keyword == "" {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Keyword parameter is required"})
+		return
+	}
+
+	results, err := h.services.SearchUsers(keyword)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+
+	context.JSON(http.StatusOK, results)
+}
+
 func (h UserHandler) SetProfilePicture(context *gin.Context) {
 
 	claims, err := GetClaims(context)
@@ -241,7 +257,7 @@ func GetClaims(context *gin.Context) (utils.UserClaims, error) {
 func GetUserIDParam(context *gin.Context) (uint64, error) {
 	userID, err := strconv.ParseUint(strings.TrimSpace(context.Param("user_id")), 10, 64)
 	if err != nil {
-		return 0, errors.New("invalid handlers ID")
+		return 0, errors.New("invalid user ID")
 	}
 	return userID, nil
 }
