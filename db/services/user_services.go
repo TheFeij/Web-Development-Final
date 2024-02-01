@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"unicode"
 )
 
 type UserServices struct {
@@ -153,6 +154,10 @@ func (userServices *UserServices) UpdateUser(req requests.RegisterUser, userID u
 func (userServices *UserServices) SearchUsers(keyword string) (responses.UsersSearch, error) {
 	var results responses.UsersSearch
 
+	if !isAlphanumeric(keyword) {
+		return responses.UsersSearch{}, errors.New("keyword should be alphanumeric")
+	}
+
 	if err := userServices.DB.Model(&models.User{}).
 		Where("username LIKE ?", "%"+keyword+"%").
 		Pluck("username", &results.Usernames).
@@ -161,4 +166,13 @@ func (userServices *UserServices) SearchUsers(keyword string) (responses.UsersSe
 	}
 
 	return results, nil
+}
+
+func isAlphanumeric(s string) bool {
+	for _, char := range s {
+		if !unicode.IsLetter(char) && !unicode.IsNumber(char) {
+			return false
+		}
+	}
+	return true
 }
