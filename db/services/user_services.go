@@ -39,12 +39,14 @@ func (userServices *UserServices) RegisterUser(req requests.RegisterUser) (respo
 	}
 
 	return responses.UserInformation{
-		ID:        newUser.ID,
-		Username:  newUser.Username,
-		Firstname: newUser.Firstname,
-		Lastname:  newUser.Lastname,
-		Bio:       newUser.Bio,
-		Phone:     newUser.Phone,
+		ID:                    newUser.ID,
+		Username:              newUser.Username,
+		Firstname:             newUser.Firstname,
+		Lastname:              newUser.Lastname,
+		Bio:                   newUser.Bio,
+		Phone:                 newUser.Phone,
+		DisplayPhone:          newUser.DisplayNumber,
+		DisplayProfilePicture: newUser.DisplayProfilePicture,
 	}, nil
 }
 
@@ -81,12 +83,14 @@ func (userServices *UserServices) GetUserInfo(userID uint) (responses.UserInform
 	}
 
 	return responses.UserInformation{
-		ID:        user.ID,
-		Username:  user.Username,
-		Firstname: user.Firstname,
-		Lastname:  user.Lastname,
-		Bio:       user.Bio,
-		Phone:     user.Phone,
+		ID:                    user.ID,
+		Username:              user.Username,
+		Firstname:             user.Firstname,
+		Lastname:              user.Lastname,
+		Bio:                   user.Bio,
+		Phone:                 user.Phone,
+		DisplayPhone:          user.DisplayNumber,
+		DisplayProfilePicture: user.DisplayProfilePicture,
 	}, nil
 }
 
@@ -102,32 +106,66 @@ func (userServices *UserServices) CheckLogin(req requests.LoginRequest) (respons
 	}
 
 	return responses.UserInformation{
-		ID:        user.ID,
-		Username:  user.Username,
-		Firstname: user.Firstname,
-		Lastname:  user.Lastname,
-		Bio:       user.Bio,
-		Phone:     user.Phone,
+		ID:                    user.ID,
+		Username:              user.Username,
+		Firstname:             user.Firstname,
+		Lastname:              user.Lastname,
+		Bio:                   user.Bio,
+		Phone:                 user.Phone,
+		DisplayPhone:          user.DisplayNumber,
+		DisplayProfilePicture: user.DisplayProfilePicture,
 	}, nil
 }
 
 func (userServices *UserServices) DeleteUser(userID uint) (responses.UserInformation, error) {
 	var user models.User
 
+	if err := userServices.DB.First(&user, userID).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	if err := userServices.DB.Where("user_id = ? OR contact_id = ?", userID, userID).
+		Delete(models.Contact{}).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	if err := userServices.DB.Model(&models.ChatParticipant{}).
+		Joins("JOIN chats ON chat_participants.chat_id = chats.id").
+		Where("chat_participants.user_id = ?", userID).
+		Update("chats.is_dead", true).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	if err := userServices.DB.Where("user_id = ?", userID).
+		Delete(models.GroupParticipant{}).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	if err := userServices.DB.Where("user_id = ?", userID).
+		Delete(models.ChannelParticipant{}).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	if err := userServices.DB.Where("user_id = ?", userID).
+		Delete(models.ChannelAdmin{}).Error; err != nil {
+		return responses.UserInformation{}, err
+	}
+
+	// Delete user
 	if err := userServices.DB.Delete(&user, userID).Error; err != nil {
 		return responses.UserInformation{}, err
 	}
 
 	return responses.UserInformation{
-		ID:        user.ID,
-		Username:  user.Username,
-		Firstname: user.Firstname,
-		Lastname:  user.Lastname,
-		Bio:       user.Bio,
-		Phone:     user.Phone,
+		ID:                    user.ID,
+		Username:              user.Username,
+		Firstname:             user.Firstname,
+		Lastname:              user.Lastname,
+		Bio:                   user.Bio,
+		Phone:                 user.Phone,
+		DisplayPhone:          user.DisplayNumber,
+		DisplayProfilePicture: user.DisplayProfilePicture,
 	}, nil
-
-	//TODO : we have to also perform deletions in other tables and delete the handlers
 }
 
 func (userServices *UserServices) UpdateUser(req requests.RegisterUser, userID uint) (responses.UserInformation, error) {
