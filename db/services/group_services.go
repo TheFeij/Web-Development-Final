@@ -15,7 +15,7 @@ type GroupServices struct {
 
 func (groupServices *GroupServices) CreateGroup(req requests.CreateGroup, userID uint) (responses.Group, error) {
 
-	newGroup := models.Groups{
+	newGroup := models.Group{
 		ID:    uint(uuid.New().ID()),
 		Name:  req.Name,
 		Owner: userID,
@@ -96,7 +96,7 @@ func (groupServices *GroupServices) DeleteGroup(userID, groupID uint) (responses
 		return responses.Group{}, err
 	}
 
-	var deletedGroup models.Groups
+	var deletedGroup models.Group
 
 	if err := groupServices.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.
@@ -127,7 +127,7 @@ func (groupServices *GroupServices) DeleteGroup(userID, groupID uint) (responses
 }
 
 func (groupServices *GroupServices) isOwner(userID, groupID uint) error {
-	var ownerCheck models.Groups
+	var ownerCheck models.Group
 	if err := groupServices.DB.
 		Where("id = ? AND owner = ?", groupID, userID).
 		First(&ownerCheck).
