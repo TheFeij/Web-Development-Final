@@ -11,7 +11,7 @@ type ContactsServices struct {
 	DB *gorm.DB
 }
 
-func (contactsServices *ContactsServices) getUserContacts(userID uint) (responses.ContactsList, error) {
+func (contactsServices *ContactsServices) GetUserContacts(userID uint) (responses.ContactsList, error) {
 	var contactsList responses.ContactsList
 
 	// Fetch specific attributes (ContactID, ContactName) for the given userID from the database
