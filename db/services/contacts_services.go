@@ -11,12 +11,6 @@ type ContactsServices struct {
 	DB *gorm.DB
 }
 
-func New(db *gorm.DB) *ContactsServices {
-	return &ContactsServices{
-		DB: db,
-	}
-}
-
 func (contactsServices *ContactsServices) getUserContacts(userID uint) (responses.ContactsList, error) {
 	var contactsList responses.ContactsList
 

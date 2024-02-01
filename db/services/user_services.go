@@ -14,12 +14,6 @@ type UserServices struct {
 	DB *gorm.DB
 }
 
-func New(db *gorm.DB) *UserServices {
-	return &UserServices{
-		DB: db,
-	}
-}
-
 func (userServices *UserServices) RegisterUser(req requests.RegisterUser) (responses.UserInformation, error) {
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {

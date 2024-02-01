@@ -13,12 +13,6 @@ type ChatServices struct {
 	DB *gorm.DB
 }
 
-func New(db *gorm.DB) *ChatServices {
-	return &ChatServices{
-		DB: db,
-	}
-}
-
 func (chatServices *ChatServices) CreateChat(req requests.CreatChat, userID uint) (responses.Chat, error) {
 	var newChat models.Chat
 
