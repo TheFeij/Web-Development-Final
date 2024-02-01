@@ -18,13 +18,6 @@ type UserHandler struct {
 	services *services.UserServices
 }
 
-func NewHandler(db *gorm.DB, services *services.UserServices) *UserHandler {
-	return &UserHandler{
-		db:       db,
-		services: services,
-	}
-}
-
 func (h UserHandler) RegisterUser(context *gin.Context) {
 
 	var req requests.RegisterUser
