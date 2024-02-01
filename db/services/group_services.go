@@ -13,7 +13,7 @@ type GroupServices struct {
 	DB *gorm.DB
 }
 
-func (groupServices *GroupServices) CreateGroup(req requests.CreatGroup, userID uint) (responses.Group, error) {
+func (groupServices *GroupServices) CreateGroup(req requests.CreateGroup, userID uint) (responses.Group, error) {
 
 	newGroup := models.Groups{
 		ID:    uint(uuid.New().ID()),
