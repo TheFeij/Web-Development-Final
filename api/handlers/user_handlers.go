@@ -60,6 +60,12 @@ func (h UserHandler) SetProfilePicture(context *gin.Context) {
 	if err != nil {
 		context.JSON(http.StatusBadRequest, errResponse(err))
 	}
+
+	if file.Size > 1048576 {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Image size should be 1 Megabyte or less"})
+		return
+	}
+
 	ext := filepath.Ext(file.Filename)
 	if ext != ".jpg" && ext != ".png" {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file extension. Supported formats: jpg, png"})
