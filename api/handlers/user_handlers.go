@@ -1,4 +1,4 @@
-package user
+package handlers
 
 import (
 	"Messenger/db/services"
@@ -216,7 +216,7 @@ func getClaims(context *gin.Context) (utils.UserClaims, error) {
 func getUserIDParam(context *gin.Context) (uint64, error) {
 	userID, err := strconv.ParseUint(strings.TrimSpace(context.Param("user_id")), 10, 64)
 	if err != nil {
-		return 0, errors.New("invalid user ID")
+		return 0, errors.New("invalid handlers ID")
 	}
 	return userID, nil
 }

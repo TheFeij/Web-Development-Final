@@ -1,8 +1,8 @@
 package api
 
 import (
+	"Messenger/api/handlers"
 	"Messenger/api/middleware"
-	"Messenger/api/user"
 	"Messenger/db/services"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -27,11 +27,11 @@ func NewServer(db *gorm.DB) *Server {
 	})
 
 	service := services.New(db)
-	userHandler := user.NewHandler(server.db, service.UserServices)
+	userHandler := handlers.NewHandler(server.db, service.UserServices)
 	server.router.POST("/api/register", userHandler.RegisterUser)
 	server.router.GET("/api/refresh-token", userHandler.GetAccessToken)
 	server.router.POST("/api/login", userHandler.Login)
-	protectedRoute := server.router.Group("/api/user")
+	protectedRoute := server.router.Group("/api/handlers")
 	{
 		protectedRoute.Use(middleware.AuthMiddleware())
 		protectedRoute.GET("/:user_id", userHandler.GetUserInformation)

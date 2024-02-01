@@ -60,7 +60,7 @@ func (channelServices *ChannelServices) AddMember(req requests.AddMember, userID
 	}
 
 	if err := channelServices.isMember(req.UserID, channelID); err == nil {
-		return responses.Member{}, errors.New("user is already a member of the channel")
+		return responses.Member{}, errors.New("handlers is already a member of the channel")
 	}
 
 	channelParticipant := models.ChannelParticipant{
@@ -146,7 +146,7 @@ func (channelServices *ChannelServices) isOwner(userID, channelID uint) error {
 		Where("id = ? AND owner_id = ?", channelID, userID).
 		First(&ownerCheck).
 		Error; err != nil {
-		return errors.New("user is not the owner of the channel")
+		return errors.New("handlers is not the owner of the channel")
 	}
 
 	return nil
@@ -158,7 +158,7 @@ func (channelServices *ChannelServices) isMember(memberID, channelID uint) error
 		Where("channel_id = ? AND user_id = ?", channelID, memberID).
 		First(&memberCheck).
 		Error; err != nil {
-		return errors.New("user is not a member of the channel")
+		return errors.New("handlers is not a member of the channel")
 	}
 
 	return nil

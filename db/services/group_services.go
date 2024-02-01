@@ -53,7 +53,7 @@ func (groupServices *GroupServices) AddMember(req requests.AddMember, userID uin
 	}
 
 	if err := groupServices.isMember(req.UserID, groupID); err == nil {
-		return responses.Member{}, errors.New("user is already a member of the group")
+		return responses.Member{}, errors.New("handlers is already a member of the group")
 	}
 
 	groupParticipant := models.GroupParticipant{
@@ -132,7 +132,7 @@ func (groupServices *GroupServices) isOwner(userID, groupID uint) error {
 		Where("id = ? AND owner = ?", groupID, userID).
 		First(&ownerCheck).
 		Error; err != nil {
-		return errors.New("user is not the owner of the group")
+		return errors.New("handlers is not the owner of the group")
 	}
 
 	return nil
@@ -144,7 +144,7 @@ func (groupServices *GroupServices) isMember(memberID, groupID uint) error {
 		Where("group_id = ? AND user_id = ?", groupID, memberID).
 		First(&memberCheck).
 		Error; err != nil {
-		return errors.New("user is not a member of the group")
+		return errors.New("handlers is not a member of the group")
 	}
 
 	return nil

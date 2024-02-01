@@ -70,7 +70,7 @@ func (chatServices *ChatServices) DeleteChat(chatID, userID uint) (responses.Cha
 		return responses.Chat{}, err
 	}
 
-	// If the user is a participant, delete the chat and associated participants
+	// If the handlers is a participant, delete the chat and associated participants
 	if err := chatServices.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("chat_id = ?", chatID).Delete(models.ChatParticipant{}).Error; err != nil {
 			return err
@@ -113,7 +113,7 @@ func (chatServices *ChatServices) GetChatContent(userID uint, chatID uint) (resp
 		return responses.ChatContent{}, err
 	}
 
-	// If the user is a participant, retrieve the chat and its messages
+	// If the handlers is a participant, retrieve the chat and its messages
 	if err := chatServices.DB.Model(&models.Chat{}).
 		Where("id = ?", chatID).
 		First(&chatContent.Chat).
@@ -159,13 +159,13 @@ func (chatServices *ChatServices) DeleteChatMessage(userID uint, chatID uint, me
 }
 
 func (chatServices *ChatServices) isUserInChat(userID uint, chatID uint) error {
-	// Check if the user is a participant of the chat
+	// Check if the handlers is a participant of the chat
 	participant := models.ChatParticipant{}
 	if err := chatServices.DB.
 		Where("chat_id = ? AND user_id = ?", chatID, userID).
 		First(&participant).
 		Error; err != nil {
-		return errors.New("user is not a participant of the chat")
+		return errors.New("handlers is not a participant of the chat")
 	}
 
 	return nil

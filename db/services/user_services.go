@@ -80,7 +80,7 @@ func (userServices *UserServices) CheckLogin(req requests.LoginRequest) (respons
 	var user models.User
 
 	if err := userServices.DB.First(&user, "username = ?", req.Username).Error; err != nil {
-		return responses.UserInformation{}, errors.New("user not found")
+		return responses.UserInformation{}, errors.New("handlers not found")
 	}
 
 	if err := utils.CheckPasswordHash(req.Password, user.Password); err != nil {
@@ -113,7 +113,7 @@ func (userServices *UserServices) DeleteUser(userID uint) (responses.UserInforma
 		Phone:     user.Phone,
 	}, nil
 
-	//TODO : we have to also perform deletions in other tables and delete the user
+	//TODO : we have to also perform deletions in other tables and delete the handlers
 }
 
 func (userServices *UserServices) UpdateUser(req requests.RegisterUser, userID uint) (responses.UserInformation, error) {
