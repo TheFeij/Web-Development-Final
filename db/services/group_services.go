@@ -99,3 +99,42 @@ func (groupServices *GroupServices) DeleteMember(memberID, userID, groupID uint)
 		UserID: deletedMember.UserID,
 	}, nil
 }
+
+func (groupServices *GroupServices) DeleteGroup(userID, groupID uint) (responses.Group, error) {
+	var ownerCheck models.Groups
+	if err := groupServices.DB.
+		Where("id = ? AND owner = ?", groupID, userID).
+		First(&ownerCheck).
+		Error; err != nil {
+		return responses.Group{}, errors.New("user is not the owner of the group")
+	}
+
+	var deletedGroup models.Groups
+
+	if err := groupServices.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.
+			Where("group_id = ?", groupID).
+			Delete(models.GroupParticipant{}).
+			Error; err != nil {
+			return err
+		}
+
+		if err := tx.
+			Where("id = ?", groupID).
+			Delete(&deletedGroup).
+			Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return responses.Group{}, err
+	}
+
+	return responses.Group{
+		ID:        deletedGroup.ID,
+		Name:      deletedGroup.Name,
+		CreatedAt: deletedGroup.CreatedAt,
+		Owner:     deletedGroup.Owner,
+	}, nil
+}
