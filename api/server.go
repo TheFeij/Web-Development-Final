@@ -3,6 +3,7 @@ package api
 import (
 	"Messenger/api/middleware"
 	"Messenger/api/user"
+	"Messenger/db/services"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -25,17 +26,18 @@ func NewServer(db *gorm.DB) *Server {
 		})
 	})
 
-	handler := user.NewHandler(server.db)
-	server.router.POST("/api/register", handler.RegisterUser)
-	server.router.GET("/api/refresh-token", handler.GetAccessToken)
-	server.router.POST("/api/login", handler.Login)
+	service := services.New(db)
+	userHandler := user.NewHandler(server.db, service.UserServices)
+	server.router.POST("/api/register", userHandler.RegisterUser)
+	server.router.GET("/api/refresh-token", userHandler.GetAccessToken)
+	server.router.POST("/api/login", userHandler.Login)
 	protectedRoute := server.router.Group("/api/user")
 	{
 		protectedRoute.Use(middleware.AuthMiddleware())
-		protectedRoute.GET("/:user_id", handler.GetUserInformation)
-		protectedRoute.POST("/set_profile_image", handler.SetProfilePicture)
-		protectedRoute.PATCH("/", handler.UpdateUser)
-		protectedRoute.DELETE("/", handler.DeleteUser)
+		protectedRoute.GET("/:user_id", userHandler.GetUserInformation)
+		protectedRoute.POST("/set_profile_image", userHandler.SetProfilePicture)
+		protectedRoute.PATCH("/", userHandler.UpdateUser)
+		protectedRoute.DELETE("/", userHandler.DeleteUser)
 	}
 
 	return server
