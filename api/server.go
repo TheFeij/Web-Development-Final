@@ -34,7 +34,8 @@ func NewServer(db *gorm.DB) *Server {
 	{
 		usersRouter.Use(middleware.AuthMiddleware())
 		usersRouter.GET("/:user_id", handler.UserHandler.GetUserInformation)
-		usersRouter.POST("/set_profile_image", handler.UserHandler.SetProfilePicture)
+		usersRouter.POST("/profile_image", handler.UserHandler.SetProfilePicture)
+		usersRouter.GET("/profile_image", handler.UserHandler.GetProfilePicture)
 		usersRouter.PATCH("/", handler.UserHandler.UpdateUser)
 		usersRouter.DELETE("/", handler.UserHandler.DeleteUser)
 
