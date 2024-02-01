@@ -2,6 +2,7 @@ package services
 
 import (
 	"Messenger/db/models"
+	"Messenger/requests"
 	"Messenger/responses"
 	"gorm.io/gorm"
 )
@@ -28,4 +29,21 @@ func (contactsServices *ContactsServices) getUserContacts(userID uint) (response
 	}
 
 	return contactsList, nil
+}
+
+func (contactsServices *ContactsServices) AddContacts(req requests.AddContact, userID uint) (responses.Contact, error) {
+	newContact := models.Contact{
+		UserID:      userID,
+		ContactID:   req.ContactID,
+		ContactName: req.ContactName,
+	}
+
+	if err := contactsServices.DB.Create(&newContact).Error; err != nil {
+		return responses.Contact{}, err
+	}
+
+	return responses.Contact{
+		ContactID:   newContact.ContactID,
+		ContactName: newContact.ContactName,
+	}, nil
 }
