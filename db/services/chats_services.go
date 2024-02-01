@@ -142,3 +142,33 @@ func (chatServices *ChatServices) GetChatContent(userID uint, chatID uint) (resp
 
 	return chatContent, nil
 }
+
+func (chatServices *ChatServices) DeleteChatMessage(userID uint, chatID uint, messageID uint) (responses.ChatMessage, error) {
+	var deletedMessage models.ChatMessage
+
+	// Check if the user is a participant of the chat
+	participant := models.ChatParticipant{}
+	if err := chatServices.DB.
+		Where("chat_id = ? AND user_id = ?", chatID, userID).
+		First(&participant).
+		Error; err != nil {
+		return responses.ChatMessage{}, errors.New("user is not a participant of the chat")
+	}
+
+	if err := chatServices.DB.Where("id = ? AND chat_id = ?", messageID, chatID).
+		Delete(&deletedMessage).
+		Error; err != nil {
+		return responses.ChatMessage{}, err
+	}
+
+	return responses.ChatMessage{
+		ID:                deletedMessage.ID,
+		ChatID:            deletedMessage.ChatID,
+		SourceSenderID:    deletedMessage.SourceSenderID,
+		OriginalMessageID: deletedMessage.OriginalMessageID,
+		SenderID:          deletedMessage.SenderID,
+		ReceiverID:        deletedMessage.ReceiverID,
+		Content:           deletedMessage.Content,
+		CreatedAt:         deletedMessage.CreatedAt,
+	}, nil
+}
