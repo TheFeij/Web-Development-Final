@@ -146,4 +146,6 @@ func (groupServices *GroupServices) isMember(memberID, groupID uint) error {
 		Error; err != nil {
 		return errors.New("user is not a member of the group")
 	}
+
+	return nil
 }
