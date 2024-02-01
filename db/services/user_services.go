@@ -23,15 +23,15 @@ func (userServices *UserServices) RegisterUser(req requests.RegisterUser) (respo
 
 	var newUser models.User
 	newUser = models.User{
-		ID:           uint(uuid.New().ID()),
-		Username:     req.Username,
-		Password:     hashedPassword,
-		Firstname:    req.Firstname,
-		Lastname:     req.Lastname,
-		Bio:          req.Bio,
-		Phone:        req.Phone,
-		DisplayImage: req.DisplayProfilePicture,
-		DisplayPhone: req.DisplayPhone,
+		ID:                    uint(uuid.New().ID()),
+		Username:              req.Username,
+		Password:              hashedPassword,
+		Firstname:             req.Firstname,
+		Lastname:              req.Lastname,
+		Bio:                   req.Bio,
+		Phone:                 req.Phone,
+		DisplayProfilePicture: req.DisplayProfilePicture,
+		DisplayNumber:         req.DisplayPhone,
 	}
 
 	if err := userServices.DB.Create(&newUser).Error; err != nil {
@@ -137,15 +137,15 @@ func (userServices *UserServices) UpdateUser(req requests.RegisterUser, userID u
 	}
 
 	user := models.User{
-		ID:           userID,
-		Username:     req.Username,
-		Password:     hashedPassword,
-		Firstname:    req.Firstname,
-		Lastname:     req.Lastname,
-		Bio:          req.Bio,
-		Phone:        req.Phone,
-		DisplayImage: req.DisplayProfilePicture,
-		DisplayPhone: req.DisplayPhone,
+		ID:                    userID,
+		Username:              req.Username,
+		Password:              hashedPassword,
+		Firstname:             req.Firstname,
+		Lastname:              req.Lastname,
+		Bio:                   req.Bio,
+		Phone:                 req.Phone,
+		DisplayProfilePicture: req.DisplayProfilePicture,
+		DisplayNumber:         req.DisplayPhone,
 	}
 
 	if err := userServices.DB.Model(&user).Updates(&user).Error; err != nil {
@@ -159,8 +159,8 @@ func (userServices *UserServices) UpdateUser(req requests.RegisterUser, userID u
 		Lastname:              user.Lastname,
 		Bio:                   user.Bio,
 		Phone:                 user.Phone,
-		DisplayPhone:          user.DisplayPhone,
-		DisplayProfilePicture: user.DisplayImage,
+		DisplayPhone:          user.DisplayNumber,
+		DisplayProfilePicture: user.DisplayProfilePicture,
 	}, nil
 }
 
