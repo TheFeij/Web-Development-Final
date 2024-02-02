@@ -22,8 +22,8 @@ create table contacts (
 
 create table chats (
     id bigint primary key,
-    isDead boolean default false,
-    createdAt date default now()
+    is_dead boolean default false,
+    created_at date default now()
 );
 
 create table chat_participants (
@@ -40,7 +40,7 @@ create table chat_messages (
     sender_id bigint,
     receiver_id bigint,
     content varchar(300),
-    createdAt date default now(),
+    created_at date default now(),
     foreign key (chat_id, sender_id) references chat_participants(chat_id, user_id),
     foreign key (chat_id, receiver_id) references chat_participants(chat_id, user_id)
 );
@@ -48,8 +48,8 @@ create table chat_messages (
 create table groups (
     id bigint primary key,
     name varchar(64) not null,
-    owner_id bigint unique,
-    createdAt date default now()
+    owner_id bigint references users(id),
+    created_at date default now()
 );
 
 create table group_participants (
@@ -69,7 +69,7 @@ create table group_messages (
     original_message_id bigint,
     sender_id bigint,
     content varchar(300),
-    createdAt date default now(),
+    created_at date default now(),
     foreign key (group_id, sender_id) references group_participants(group_id, user_id)
 );
 
@@ -77,7 +77,7 @@ create table channels (
     id bigint primary key,
     name varchar(64) not null,
     owner_id bigint references users(id),
-    createdAt date default now()
+    created_at date default now()
 );
 
 create table channel_participants (
@@ -104,6 +104,6 @@ create table channel_posts (
     original_message_id bigint,
     sender_id bigint references users(id),
     content varchar(300),
-    createdAt date default now(),
+    created_at date default now(),
     foreign key (channel_id, sender_id) references channel_admins(channel_id, user_id)
 );
