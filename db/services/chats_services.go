@@ -70,6 +70,10 @@ func (chatServices *ChatServices) DeleteChat(chatID, userID uint) (responses.Cha
 		return responses.Chat{}, err
 	}
 
+	if err := chatServices.DB.First(&deletedChat, chatID).Error; err != nil {
+		return responses.Chat{}, err
+	}
+
 	// If the handlers is a participant, delete the chat and associated participants
 	if err := chatServices.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("chat_id = ?", chatID).Delete(models.ChatParticipant{}).Error; err != nil {
