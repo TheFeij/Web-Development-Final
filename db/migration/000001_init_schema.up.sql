@@ -58,10 +58,6 @@ create table group_participants (
     primary key (group_id, user_id)
 );
 
--- adding the foreign key that owner of a chat be a participant of that group
-alter table groups
-    add constraint fk_owner foreign key(id, owner_id) references group_participants(group_id, user_id);
-
 create table group_messages (
     id bigint primary key,
     group_id bigint,
@@ -92,10 +88,6 @@ create table channel_admins (
     primary key (channel_id, user_id),
     foreign key (channel_id, user_id) references channel_participants(channel_id, user_id)
 );
-
--- adding the foreign key that owner of a channel be an admin of that channel
-alter table channels
-    add constraint fk_owner foreign key(id, owner_id) references channel_admins(channel_id, user_id);
 
 create table channel_posts (
     id bigint primary key,
