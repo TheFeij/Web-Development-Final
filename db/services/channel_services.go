@@ -159,7 +159,69 @@ func (channelServices *ChannelServices) isMember(memberID, channelID uint) error
 		First(&memberCheck).
 		Error; err != nil {
 		return errors.New("handlers is not a member of the channel")
+func (channelServices *ChannelServices) isAdmin(memberID, channelID uint) error {
+	var adminCheck models.ChannelAdmin
+	if err := channelServices.DB.
+		Where("channel_id = ? AND user_id = ?", channelID, memberID).
+		First(&adminCheck).
+		Error; err != nil {
+		return errors.New("user is not a admin of the channel")
 	}
 
 	return nil
+}
+
+func (channelServices *ChannelServices) AddAdmin(req requests.AddMember, userID, channelID uint) (responses.Member, error) {
+	var member models.ChannelParticipant
+
+	if err := channelServices.isOwner(userID, channelID); err != nil {
+		return responses.Member{}, err
+	}
+
+	err := channelServices.DB.
+		Where("channel_id = ? and user_id = ?", channelID, userID).
+		First(&member).
+		Error
+	if err != nil {
+		return responses.Member{}, err
+	}
+
+	if err := channelServices.isAdmin(req.UserID, channelID); err == nil {
+		return responses.Member{}, errors.New("member is already an admin")
+	}
+
+	channelAdmin := models.ChannelAdmin{
+		ChannelID: channelID,
+		UserID:    req.UserID,
+	}
+
+	if err := channelServices.DB.Create(&channelAdmin).Error; err != nil {
+		return responses.Member{}, err
+	}
+
+	return responses.Member{
+		UserID: req.UserID,
+	}, nil
+}
+
+func (channelServices *ChannelServices) DeleteAdmin(adminID, userID, channelID uint) (responses.Member, error) {
+	if err := channelServices.isOwner(userID, channelID); err != nil {
+		return responses.Member{}, err
+	}
+
+	// Check if the target user is an admin
+	if err := channelServices.isAdmin(adminID, channelID); err != nil {
+		return responses.Member{}, errors.New("user is not admin")
+	}
+
+	if err := channelServices.DB.
+		Where("channel_id = ? and user_id = ?", channelID, adminID).
+		Delete(&models.ChannelAdmin{}).
+		Error; err != nil {
+		return responses.Member{}, err
+	}
+
+	return responses.Member{
+		UserID: adminID,
+	}, nil
 }

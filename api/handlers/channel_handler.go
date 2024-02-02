@@ -107,3 +107,51 @@ func getChannelIDParam(context *gin.Context) (uint64, error) {
 	}
 	return channelID, nil
 }
+
+func (h *ChannelHandler) AddAdmin(context *gin.Context) {
+	claims, _ := GetClaims(context)
+
+	channelID, err := getChannelIDParam(context)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, errResponse(err))
+		return
+	}
+
+	var req requests.AddMember
+	if err := context.ShouldBindJSON(&req); err != nil {
+		context.JSON(http.StatusBadRequest, errResponse(err))
+		return
+	}
+
+	addedAdmin, err := h.services.AddAdmin(req, claims.ID, uint(channelID))
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+
+	context.JSON(http.StatusOK, addedAdmin)
+}
+
+func (h *ChannelHandler) DeleteAdmin(context *gin.Context) {
+	claims, _ := GetClaims(context)
+
+	channelID, err := getChannelIDParam(context)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, errResponse(err))
+		return
+	}
+
+	userID, err := getUserIDParam(context)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, errResponse(err))
+		return
+	}
+
+	deletedAdmin, err := h.services.DeleteAdmin(uint(userID), claims.ID, uint(channelID))
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, errResponse(err))
+		return
+	}
+
+	context.JSON(http.StatusOK, deletedAdmin)
+}
