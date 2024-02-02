@@ -73,7 +73,7 @@ func (h *ChatHandler) DeleteChat(context *gin.Context) {
 		return
 	}
 
-	deletedChat, err := h.services.DeleteChat(claims.ID, uint(chatID))
+	deletedChat, err := h.services.DeleteChat(uint(chatID), claims.ID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, errResponse(err))
 		return
