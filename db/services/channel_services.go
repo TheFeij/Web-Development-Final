@@ -73,7 +73,7 @@ func (channelServices *ChannelServices) AddMember(req requests.AddMember, userID
 	}
 
 	return responses.Member{
-		UserID: channelParticipant.UserID,
+		UserID: req.UserID,
 	}, nil
 }
 
