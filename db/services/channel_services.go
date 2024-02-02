@@ -104,6 +104,9 @@ func (channelServices *ChannelServices) DeleteChannel(userID, channelID uint) (r
 	}
 
 	var deletedChannel models.Channel
+	if err := channelServices.DB.First(&deletedChannel, channelID).Error; err != nil {
+		return responses.Channel{}, err
+	}
 
 	if err := channelServices.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.
