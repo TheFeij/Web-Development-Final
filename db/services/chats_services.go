@@ -28,7 +28,7 @@ func (chatServices *ChatServices) CreateChat(req requests.CreateChat, userID uin
 
 	if err := chatServices.DB.Transaction(func(tx *gorm.DB) error {
 		// If no chat exists, create a new chat and add participants
-		newChat := models.Chat{
+		newChat = models.Chat{
 			ID:     uint(uuid.New().ID()),
 			IsDead: false,
 		}
