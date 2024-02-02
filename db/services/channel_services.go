@@ -143,7 +143,7 @@ func (channelServices *ChannelServices) DeleteChannel(userID, channelID uint) (r
 		ID:        deletedChannel.ID,
 		Name:      deletedChannel.Name,
 		CreatedAt: deletedChannel.CreatedAt,
-		Owner:     deletedChannel.Owner,
+		Owner:     deletedChannel.OwnerID,
 	}, nil
 }
 
