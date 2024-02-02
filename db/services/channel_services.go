@@ -94,7 +94,7 @@ func (channelServices *ChannelServices) DeleteMember(memberID, userID, channelID
 	}
 
 	return responses.Member{
-		UserID: deletedMember.UserID,
+		UserID: memberID,
 	}, nil
 }
 
