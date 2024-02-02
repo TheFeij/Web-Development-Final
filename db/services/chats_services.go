@@ -170,7 +170,7 @@ func (chatServices *ChatServices) DeleteChatMessage(userID uint, chatID uint, me
 
 func (chatServices *ChatServices) isUserInChat(userID uint, chatID uint) error {
 	// Check if the handlers is a participant of the chat
-	participant := models.ChatParticipant{}
+	var participant models.ChatParticipant
 	if err := chatServices.DB.
 		Where("chat_id = ? AND user_id = ?", chatID, userID).
 		First(&participant).
