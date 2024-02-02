@@ -108,6 +108,13 @@ func (channelServices *ChannelServices) DeleteChannel(userID, channelID uint) (r
 	if err := channelServices.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.
 			Where("channel_id = ?", channelID).
+			Delete(models.ChannelAdmin{}).
+			Error; err != nil {
+			return err
+		}
+
+		if err := tx.
+			Where("channel_id = ?", channelID).
 			Delete(models.ChannelParticipant{}).
 			Error; err != nil {
 			return err
