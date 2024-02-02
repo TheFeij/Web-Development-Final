@@ -15,9 +15,9 @@ type ChannelServices struct {
 
 func (channelServices *ChannelServices) CreateChannel(req requests.CreateChannel, userID uint) (responses.Channel, error) {
 	newChannel := models.Channel{
-		ID:    uint(uuid.New().ID()),
-		Name:  req.Name,
-		Owner: userID,
+		ID:      uint(uuid.New().ID()),
+		Name:    req.Name,
+		OwnerID: userID,
 	}
 
 	if err := channelServices.DB.Transaction(func(tx *gorm.DB) error {
@@ -158,7 +158,12 @@ func (channelServices *ChannelServices) isMember(memberID, channelID uint) error
 		Where("channel_id = ? AND user_id = ?", channelID, memberID).
 		First(&memberCheck).
 		Error; err != nil {
-		return errors.New("handlers is not a member of the channel")
+		return errors.New("user is not a member of the channel")
+	}
+
+	return nil
+}
+
 func (channelServices *ChannelServices) isAdmin(memberID, channelID uint) error {
 	var adminCheck models.ChannelAdmin
 	if err := channelServices.DB.
