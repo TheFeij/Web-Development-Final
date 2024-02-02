@@ -50,7 +50,9 @@ func (contactsServices *ContactsServices) DeleteContacts(contactID uint, userID 
 		return responses.Contact{}, err
 	}
 
-	if err := contactsServices.DB.Delete(&contact).Error; err != nil {
+	if err := contactsServices.DB.
+		Where("user_id = ? AND contact_id = ?", userID, contactID).
+		Delete(&contact).Error; err != nil {
 		return responses.Contact{}, err
 	}
 
