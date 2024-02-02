@@ -153,7 +153,7 @@ func (channelServices *ChannelServices) isOwner(userID, channelID uint) error {
 		Where("id = ? AND owner_id = ?", channelID, userID).
 		First(&ownerCheck).
 		Error; err != nil {
-		return errors.New("handlers is not the owner of the channel")
+		return errors.New("user is not the owner of the channel")
 	}
 
 	return nil
