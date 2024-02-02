@@ -175,7 +175,7 @@ func (chatServices *ChatServices) isUserInChat(userID uint, chatID uint) error {
 		Where("chat_id = ? AND user_id = ?", chatID, userID).
 		First(&participant).
 		Error; err != nil {
-		return errors.New("handlers is not a participant of the chat")
+		return errors.New("user is not a participant of the chat")
 	}
 
 	return nil
