@@ -97,6 +97,11 @@ func (groupServices *GroupServices) DeleteGroup(userID, groupID uint) (responses
 	}
 
 	var deletedGroup models.Group
+	if err := groupServices.DB.
+		First(&deletedGroup, groupID).
+		Error; err != nil {
+		return responses.Group{}, err
+	}
 
 	if err := groupServices.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.
