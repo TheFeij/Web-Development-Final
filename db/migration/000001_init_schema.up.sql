@@ -5,7 +5,7 @@ create table users (
     phone char(11) unique,
     username varchar(128) unique,
     password varchar,
-    image varchar unique,
+    image varchar,
     bio varchar(100),
     display_number boolean default true,
     display_profile_picture boolean default true
