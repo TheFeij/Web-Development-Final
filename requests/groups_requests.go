@@ -1,8 +1,7 @@
 package requests
 
 type CreateGroup struct {
-	Name    string `json:"name" validate:"required;min=1;max=64"`
-	OwnerID uint   `json:"owner_id" validate:"required"`
+	Name string `json:"name" validate:"required;min=1;max=64"`
 }
 
 type AddMember struct {
