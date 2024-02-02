@@ -120,39 +120,42 @@ func (userServices *UserServices) CheckLogin(req requests.LoginRequest) (respons
 func (userServices *UserServices) DeleteUser(userID uint) (responses.UserInformation, error) {
 	var user models.User
 
-	if err := userServices.DB.First(&user, userID).Error; err != nil {
-		return responses.UserInformation{}, err
-	}
+	if err := userServices.DB.Transaction(func(tx *gorm.DB) error {
+		if err := userServices.DB.First(&user, userID).Error; err != nil {
+			return err
+		}
 
-	if err := userServices.DB.Where("user_id = ? OR contact_id = ?", userID, userID).
-		Delete(models.Contact{}).Error; err != nil {
-		return responses.UserInformation{}, err
-	}
+		if err := userServices.DB.Where("user_id = ? OR contact_id = ?", userID, userID).
+			Delete(models.Contact{}).Error; err != nil {
+			return err
+		}
 
-	if err := userServices.DB.Model(&models.ChatParticipant{}).
-		Joins("JOIN chats ON chat_participants.chat_id = chats.id").
-		Where("chat_participants.user_id = ?", userID).
-		Update("chats.is_dead", true).Error; err != nil {
-		return responses.UserInformation{}, err
-	}
+		if err := userServices.DB.Where("user_id = ?", userID).
+			Delete(models.ChatParticipant{}).Error; err != nil {
+			return err
+		}
 
-	if err := userServices.DB.Where("user_id = ?", userID).
-		Delete(models.GroupParticipant{}).Error; err != nil {
-		return responses.UserInformation{}, err
-	}
+		if err := userServices.DB.Where("user_id = ?", userID).
+			Delete(models.GroupParticipant{}).Error; err != nil {
+			return err
+		}
 
-	if err := userServices.DB.Where("user_id = ?", userID).
-		Delete(models.ChannelParticipant{}).Error; err != nil {
-		return responses.UserInformation{}, err
-	}
+		if err := userServices.DB.Where("user_id = ?", userID).
+			Delete(models.ChannelParticipant{}).Error; err != nil {
+			return err
+		}
 
-	if err := userServices.DB.Where("user_id = ?", userID).
-		Delete(models.ChannelAdmin{}).Error; err != nil {
-		return responses.UserInformation{}, err
-	}
+		if err := userServices.DB.Where("user_id = ?", userID).
+			Delete(models.ChannelAdmin{}).Error; err != nil {
+			return err
+		}
 
-	// Delete user
-	if err := userServices.DB.Delete(&user, userID).Error; err != nil {
+		if err := userServices.DB.Delete(&user, userID).Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
 		return responses.UserInformation{}, err
 	}
 
