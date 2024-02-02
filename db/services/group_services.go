@@ -16,9 +16,9 @@ type GroupServices struct {
 func (groupServices *GroupServices) CreateGroup(req requests.CreateGroup, userID uint) (responses.Group, error) {
 
 	newGroup := models.Group{
-		ID:    uint(uuid.New().ID()),
-		Name:  req.Name,
-		Owner: userID,
+		ID:      uint(uuid.New().ID()),
+		Name:    req.Name,
+		OwnerID: userID,
 	}
 
 	if err := groupServices.DB.Transaction(func(tx *gorm.DB) error {
@@ -43,7 +43,7 @@ func (groupServices *GroupServices) CreateGroup(req requests.CreateGroup, userID
 		ID:        newGroup.ID,
 		Name:      newGroup.Name,
 		CreatedAt: newGroup.CreatedAt,
-		Owner:     newGroup.Owner,
+		Owner:     newGroup.OwnerID,
 	}, nil
 }
 
@@ -122,14 +122,14 @@ func (groupServices *GroupServices) DeleteGroup(userID, groupID uint) (responses
 		ID:        deletedGroup.ID,
 		Name:      deletedGroup.Name,
 		CreatedAt: deletedGroup.CreatedAt,
-		Owner:     deletedGroup.Owner,
+		Owner:     deletedGroup.OwnerID,
 	}, nil
 }
 
 func (groupServices *GroupServices) isOwner(userID, groupID uint) error {
 	var ownerCheck models.Group
 	if err := groupServices.DB.
-		Where("id = ? AND owner = ?", groupID, userID).
+		Where("id = ? AND owner_id = ?", groupID, userID).
 		First(&ownerCheck).
 		Error; err != nil {
 		return errors.New("handlers is not the owner of the group")
