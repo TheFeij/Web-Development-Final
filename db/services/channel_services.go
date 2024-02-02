@@ -50,7 +50,7 @@ func (channelServices *ChannelServices) CreateChannel(req requests.CreateChannel
 		ID:        newChannel.ID,
 		Name:      newChannel.Name,
 		CreatedAt: newChannel.CreatedAt,
-		Owner:     newChannel.Owner,
+		Owner:     newChannel.OwnerID,
 	}, nil
 }
 
