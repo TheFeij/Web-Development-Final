@@ -137,7 +137,7 @@ func (groupServices *GroupServices) isOwner(userID, groupID uint) error {
 		Where("id = ? AND owner_id = ?", groupID, userID).
 		First(&ownerCheck).
 		Error; err != nil {
-		return errors.New("handlers is not the owner of the group")
+		return errors.New("user is not the owner of the group")
 	}
 
 	return nil
