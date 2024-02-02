@@ -87,7 +87,7 @@ func (groupServices *GroupServices) DeleteMember(memberID, userID, groupID uint)
 	}
 
 	return responses.Member{
-		UserID: deletedMember.UserID,
+		UserID: memberID,
 	}, nil
 }
 
