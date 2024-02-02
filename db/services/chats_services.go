@@ -145,6 +145,12 @@ func (chatServices *ChatServices) DeleteChatMessage(userID uint, chatID uint, me
 	}
 
 	if err := chatServices.DB.Where("id = ? AND chat_id = ?", messageID, chatID).
+		First(&deletedMessage).
+		Error; err != nil {
+		return responses.ChatMessage{}, err
+	}
+
+	if err := chatServices.DB.Where("id = ? AND chat_id = ?", messageID, chatID).
 		Delete(&deletedMessage).
 		Error; err != nil {
 		return responses.ChatMessage{}, err
