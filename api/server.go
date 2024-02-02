@@ -68,9 +68,6 @@ func NewServer(db *gorm.DB) *Server {
 	{
 		channelsRouter.Use(middleware.AuthMiddleware())
 		channelsRouter.POST("/", handler.ChannelHandler.CreateChannel)
-		channelsRouter.DELETE("/:channels_id", handler.ChannelHandler.DeleteChannel)
-		channelsRouter.PATCH("/:channels_id", handler.ChannelHandler.AddMember)
-		channelsRouter.DELETE("/:channels_id/:user_id", handler.ChannelHandler.DeleteMember)
 		channelsRouter.DELETE("/:channel_id", handler.ChannelHandler.DeleteChannel)
 		channelsRouter.PATCH("/:channel_id", handler.ChannelHandler.AddMember)
 		channelsRouter.DELETE("/:channel_id/:user_id", handler.ChannelHandler.DeleteMember)
